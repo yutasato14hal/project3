@@ -1,18 +1,20 @@
-"use client"
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { BriefcaseIcon, Users, Clock, User } from "lucide-react";
-import { useState } from "react";
-import Image from "next/image";
-import businessManImage from "@/public/images/FV.png";
-import badgeImage from "@/public/images/badge.png";
+'use client';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { BriefcaseIcon, Users, Clock, User } from 'lucide-react';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import Image from 'next/image';
+import businessManImage from '@/public/images/FV.png';
+import badgeImage from '@/public/images/badge.png';
+import Link from 'next/link';
 export default function CareerLanding() {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    tel: "",
+    name: '',
+    email: '',
+    tel: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState<{
@@ -47,9 +49,9 @@ export default function CareerLanding() {
     // 入力検証
     if (!namePattern.test(formData.name)) {
       setFormStatus({
-        type: "error",
+        type: 'error',
         message:
-          "名前は2〜30文字以内で、日本語、英字、スペースのみ使用可能です。",
+          '名前は2〜30文字以内で、日本語、英字、スペースのみ使用可能です。',
       });
       setIsSubmitting(false);
       return; // 名前が無効な場合、ここで早期リターン
@@ -57,8 +59,8 @@ export default function CareerLanding() {
 
     if (!emailPattern.test(formData.email)) {
       setFormStatus({
-        type: "error",
-        message: "無効なメールアドレスです。",
+        type: 'error',
+        message: '無効なメールアドレスです。',
       });
       setIsSubmitting(false);
       return; // メールアドレスが無効な場合、ここで早期リターン
@@ -66,9 +68,9 @@ export default function CareerLanding() {
 
     if (!telPattern.test(formData.tel)) {
       setFormStatus({
-        type: "error",
+        type: 'error',
         message:
-          "電話番号は日本の形式、または国際形式（+81 90 1234 5678など）で入力してください。",
+          '電話番号は日本の形式、または国際形式（+81 90 1234 5678など）で入力してください。',
       });
       setIsSubmitting(false);
       return; // 電話番号が無効な場合、ここで早期リターン
@@ -77,11 +79,11 @@ export default function CareerLanding() {
     // API送信処理
     try {
       const response = await fetch(
-        "https://carrer-api.vercel.app/api/contact",
+        'https://career-api-puce.vercel.app/api/contact',
         {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(formData),
         }
@@ -89,28 +91,59 @@ export default function CareerLanding() {
 
       if (response.ok) {
         setFormStatus({
-          type: "success",
-          message: "お問い合わせありがとうございました。",
+          type: 'success',
+          message: 'お問い合わせありがとうございました。',
         });
-        setFormData({ name: "", email: "", tel: "" }); // 送信後にフォームリセット
+        setFormData({ name: '', email: '', tel: '' }); // 送信後にフォームリセット
       } else {
         const data = await response.json();
         setFormStatus({
-          type: "error",
-          message: data.message || "送信に失敗しました。",
+          type: 'error',
+          message: data.message || '送信に失敗しました。',
         });
       }
     } catch (e) {
       setFormStatus({
-        type: "error",
-        message: "予期しないエラーが発生しました。",
+        type: 'error',
+        message: '予期しないエラーが発生しました。',
       });
       console.log(e);
     } finally {
       setIsSubmitting(false);
     }
   };
+  // スクロールイベント処理
 
+  const scrollToContact = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    document
+      .getElementById('contact-form')
+      ?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // 要素のスクロール表示処理
+  useEffect(() => {
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    };
+
+    const observerOptions = {
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver(
+      observerCallback,
+      observerOptions
+    );
+    const elements = document.querySelectorAll('.animate-on-scroll');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-teal-50 to-cyan-50">
       {/* Hero Section */}
@@ -129,6 +162,16 @@ export default function CareerLanding() {
               <p className="text-lg text-blue-600">
                 オンライン・オフライン両対応 あなたの都合に合わせて徹底サポート
               </p>
+              <div className="flex md:justify-start">
+                <Link
+                  href="#contact-form"
+                  onClick={scrollToContact}
+                  className="mt-6 sm:mt-16 lg:mt-20 rounded-full mx-auto lg:mx-0 sm:px-16 px-8 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden group dark:from-neutral-50 dark:to-neutral-900 hover:from-blue-700 hover:to-teal-700 text-sm sm:text-base"
+                >
+                  <span className="relative z-10">無料相談を予約する</span>
+                  <span className="absolute inset-0 flow-light focus-visible:ring-2 focus-visible:ring-neutral-950 dark:focus-visible:ring-neutral-300"></span>
+                </Link>
+              </div>
             </div>
             <div className="w-full lg:w-1/2 px-4">
               <div className="relative rounded-xl overflow-hidden shadow-2xl">
@@ -154,21 +197,22 @@ export default function CareerLanding() {
             転職の失敗例
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-  {[
-    "準備不足で希望の条件が引き出せない",
-    "面接で自己PRができない",
-    "市場価値がわからず年収ダウン",
-    "入社後のギャップで早期退職",
-  ].map((problem, index) => (
-    <Card
-      key={index}
-      className="flex items-center justify-center p-6 hover:shadow-lg transition-shadow bg-gradient-to-br from-blue-50/90 to-teal-50/90 backdrop-blur-sm border-blue-200"
-    >
-      <p className="font-semibold text-blue-800 text-center">{problem}</p>
-    </Card>
-  ))}
-</div>
-
+            {[
+              '準備不足で希望の条件が引き出せない',
+              '面接で自己PRができない',
+              '市場価値がわからず年収ダウン',
+              '入社後のギャップで早期退職',
+            ].map((problem, index) => (
+              <Card
+                key={index}
+                className="flex items-center justify-center p-6 hover:shadow-lg transition-shadow bg-gradient-to-br from-blue-50/90 to-teal-50/90 backdrop-blur-sm border-blue-200"
+              >
+                <p className="font-semibold text-blue-800 text-center">
+                  {problem}
+                </p>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -234,7 +278,7 @@ export default function CareerLanding() {
                 <Image
                   src={badgeImage}
                   alt="Gold Badge"
-                  layout="fill"
+                 fill
                   objectFit="contain"
                 />
               </div>
@@ -248,7 +292,7 @@ export default function CareerLanding() {
                 <Image
                   src={badgeImage}
                   alt="Gold Badge"
-                  layout="fill"
+                  fill
                   objectFit="contain"
                 />
               </div>
@@ -260,7 +304,7 @@ export default function CareerLanding() {
                 <Image
                   src={badgeImage}
                   alt="Gold Badge"
-                  layout="fill"
+                  fill
                   objectFit="contain"
                 />
               </div>
@@ -279,9 +323,9 @@ export default function CareerLanding() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { label: "30代 男性", role: "IT業界からWeb業界へ転職" },
-              { label: "40代 女性", role: "営業職から人事へキャリアチェンジ" },
-              { label: "20代 男性", role: "未経験からエンジニアへ転身" },
+              { label: '30代 男性', role: 'IT業界からWeb業界へ転職' },
+              { label: '40代 女性', role: '営業職から人事へキャリアチェンジ' },
+              { label: '20代 男性', role: '未経験からエンジニアへ転身' },
             ].map((testimonial, index) => (
               <Card
                 key={index}
@@ -364,9 +408,9 @@ export default function CareerLanding() {
             {formStatus && (
               <div
                 className={`text-center ${
-                  formStatus.type === "error"
-                    ? "text-red-500"
-                    : "text-green-500"
+                  formStatus.type === 'error'
+                    ? 'text-red-500'
+                    : 'text-green-500'
                 }`}
               >
                 {formStatus.message}
@@ -378,7 +422,7 @@ export default function CareerLanding() {
               className="w-full bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold py-2 px-4 rounded"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "送信中..." : "送信する"}
+              {isSubmitting ? '送信中...' : '送信する'}
             </Button>
           </form>
         </div>
